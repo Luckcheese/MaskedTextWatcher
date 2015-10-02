@@ -1,14 +1,41 @@
 <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        tools:context=".SampleActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".SampleActivity">
 
-    <TextView
-            android:text="Hello World!"
+        <TextView
+            android:text="Enter the mask on the first field and test it on the second one!"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/mask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mask"
+            android:maxLines="1" />
+
+        <Button
+            android:id="@+id/apply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apply Mask" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="#AAAAAA" />
+
+        <EditText
+            android:id="@+id/testArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Test area"
+            android:maxLines="1" />
 </LinearLayout>
