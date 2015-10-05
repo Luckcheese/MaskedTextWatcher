@@ -54,6 +54,15 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         assertEquals("aa", mask.clean(" a a"));
         assertEquals("ab", mask.clean(" a b"));
         assertEquals("#b", mask.clean(" # b"));
+
+        mask.setMask("# #/#-##");
+        assertEquals("0", mask.clean("0"));
+        assertEquals("0", mask.clean("0 "));
+        assertEquals("01", mask.clean("0 1"));
+        assertEquals("021", mask.clean("0 21"));
+        assertEquals("021", mask.clean("0 2/1"));
+        assertEquals("021", mask.clean("0 2/1-"));
+        assertEquals("021", mask.clean("02 1/"));
     }
 
     public void testFormat() throws Exception {
@@ -110,6 +119,18 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         keyboardKeyPressed(KeyEvent.KEYCODE_5, "01/23/45");
         keyboardKeyPressed(KeyEvent.KEYCODE_6, "01/23/456");
         keyboardKeyPressed(KeyEvent.KEYCODE_7, "01/23/4567");
+    }
+
+    public void testMaskChangingSelection() throws Exception {
+        mask.setMask("# #/#-##");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0 ");
+        keyboardKeyPressed(KeyEvent.KEYCODE_1, "0 1/");
+        editText.setSelection(2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_2, "0 2/1-");
+        keyboardKeyPressed(KeyEvent.KEYCODE_3, "0 2/3-1");
+        keyboardKeyPressed(KeyEvent.KEYCODE_4, "0 2/3-41");
+        keyboardKeyPressed(KeyEvent.KEYCODE_5, "0 2/3-45");
+        keyboardKeyPressed(KeyEvent.KEYCODE_6, "0 2/3-45");
     }
 
     // ----- Helper methods ---------------------------------------------------

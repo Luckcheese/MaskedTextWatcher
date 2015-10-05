@@ -4,10 +4,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+import java.util.HashSet;
+
 public class MaskedTextWatcher implements TextWatcher {
 
-    private String mask;
-    private int variableCharsQty;
+    private MaskInfo mask;
     private EditText editText;
 
     private boolean editting;
@@ -22,14 +23,7 @@ public class MaskedTextWatcher implements TextWatcher {
             this.mask = null;
         }
         else {
-            this.mask = mask;
-            this.variableCharsQty = 0;
-            for (int i = 0; i < mask.length(); i++) {
-                if (mask.charAt(i) == '#') {
-                    variableCharsQty++;
-                }
-            }
-
+            this.mask = new MaskInfo(mask);
             editText.setText(applyMaskToString(editText.getText().toString()));
         }
     }
@@ -43,6 +37,9 @@ public class MaskedTextWatcher implements TextWatcher {
             int selectedPos = editText.getSelectionStart();
             String withMask = applyMaskToString(s.toString());
             editText.setText(withMask);
+            if (selectedPos > withMask.length()) {
+                selectedPos = withMask.length();
+            }
             while (selectedPos < mask.length() && mask.charAt(selectedPos) != '#') {
                 selectedPos++;
             }
@@ -67,18 +64,11 @@ public class MaskedTextWatcher implements TextWatcher {
     }
 
     protected String clean(String editTextString) {
-        StringBuilder cleaned = new StringBuilder();
-        for (int i = 0; i < editTextString.length(); i++) {
-            char c = editTextString.charAt(i);
-            if (c != mask.charAt(i) || c == '#') {
-                cleaned.append(c);
-            }
-
-            if (cleaned.length() == variableCharsQty) {
-                break;
-            }
+        String cleanedString = editTextString.replaceAll(mask.fixedCharsRegex, "");
+        if (cleanedString.length() > mask.variableCharsQty) {
+            return cleanedString.substring(0, mask.variableCharsQty);
         }
-        return cleaned.toString();
+        return cleanedString;
     }
 
     protected String format(String cleanedString) {
@@ -95,5 +85,41 @@ public class MaskedTextWatcher implements TextWatcher {
             }
         }
         return formatted.toString();
+    }
+
+    // ----- Related classes --------------------------------------------------
+
+    private static final class MaskInfo {
+        private String mask;
+
+        public String fixedCharsRegex;
+        public int variableCharsQty;
+
+        public MaskInfo(String mask) {
+            this.mask = mask;
+
+            String fixedChars = mask.replace("#", "");
+            variableCharsQty = mask.length() - fixedChars.length();
+
+            HashSet<Character> fixedCharsSet = new HashSet<Character>();
+            for (int i = 0; i < fixedChars.length(); i++) {
+                fixedCharsSet.add(fixedChars.charAt(i));
+            }
+
+            if (fixedCharsSet.size() > 0) {
+                fixedCharsRegex = fixedCharsSet.toString().replace(", ", "").replace("-", "\\-");
+            }
+            else {
+                fixedCharsRegex = "";
+            }
+        }
+
+        public int length() {
+            return mask.length();
+        }
+
+        public char charAt(int i) {
+            return mask.charAt(i);
+        }
     }
 }
