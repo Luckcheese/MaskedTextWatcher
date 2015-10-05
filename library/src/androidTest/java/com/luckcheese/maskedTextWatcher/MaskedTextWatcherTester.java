@@ -12,9 +12,10 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mask = new MaskedTextWatcher(null);
 
         editText = new EditText(getContext());
+        mask = new MaskedTextWatcher(null, editText);
+
         editText.addTextChangedListener(mask);
         editText.requestFocus();
     }
@@ -77,6 +78,38 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         assertEquals("0 2/1-", mask.format("021"));
         assertEquals("0 2/1-3", mask.format("0213"));
         assertEquals("0 2/1-3400", mask.format("02134"));
+    }
+
+    public void testCardNumberMask() throws Exception {
+        mask.setMask("#### #### #### ####");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0");
+        keyboardKeyPressed(KeyEvent.KEYCODE_1, "01");
+        keyboardKeyPressed(KeyEvent.KEYCODE_2, "012");
+        keyboardKeyPressed(KeyEvent.KEYCODE_3, "0123 ");
+        keyboardKeyPressed(KeyEvent.KEYCODE_4, "0123 4");
+        keyboardKeyPressed(KeyEvent.KEYCODE_5, "0123 45");
+        keyboardKeyPressed(KeyEvent.KEYCODE_6, "0123 456");
+        keyboardKeyPressed(KeyEvent.KEYCODE_7, "0123 4567 ");
+        keyboardKeyPressed(KeyEvent.KEYCODE_8, "0123 4567 8");
+        keyboardKeyPressed(KeyEvent.KEYCODE_9, "0123 4567 89");
+        keyboardKeyPressed(KeyEvent.KEYCODE_A, "0123 4567 89a");
+        keyboardKeyPressed(KeyEvent.KEYCODE_B, "0123 4567 89ab ");
+        keyboardKeyPressed(KeyEvent.KEYCODE_C, "0123 4567 89ab c");
+        keyboardKeyPressed(KeyEvent.KEYCODE_D, "0123 4567 89ab cd");
+        keyboardKeyPressed(KeyEvent.KEYCODE_E, "0123 4567 89ab cde");
+        keyboardKeyPressed(KeyEvent.KEYCODE_F, "0123 4567 89ab cdef");
+    }
+
+    public void testDateMask() throws Exception {
+        mask.setMask("##/##/####");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0");
+        keyboardKeyPressed(KeyEvent.KEYCODE_1, "01/");
+        keyboardKeyPressed(KeyEvent.KEYCODE_2, "01/2");
+        keyboardKeyPressed(KeyEvent.KEYCODE_3, "01/23/");
+        keyboardKeyPressed(KeyEvent.KEYCODE_4, "01/23/4");
+        keyboardKeyPressed(KeyEvent.KEYCODE_5, "01/23/45");
+        keyboardKeyPressed(KeyEvent.KEYCODE_6, "01/23/456");
+        keyboardKeyPressed(KeyEvent.KEYCODE_7, "01/23/4567");
     }
 
     // ----- Helper methods ---------------------------------------------------

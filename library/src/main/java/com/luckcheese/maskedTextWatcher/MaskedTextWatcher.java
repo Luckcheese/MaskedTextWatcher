@@ -2,14 +2,18 @@ package com.luckcheese.maskedTextWatcher;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.EditText;
 
 public class MaskedTextWatcher implements TextWatcher {
 
     private String mask;
     private int variableCharsQty;
+    private EditText editText;
 
-    public MaskedTextWatcher(String mask) {
-        this.mask = mask;
+    private boolean editting;
+
+    public MaskedTextWatcher(String mask, EditText editText) {
+        this.editText = editText;
         setMask(mask);
     }
 
@@ -25,6 +29,8 @@ public class MaskedTextWatcher implements TextWatcher {
                     variableCharsQty++;
                 }
             }
+
+            editText.setText(applyMaskToString(editText.getText().toString()));
         }
     }
 
@@ -32,6 +38,17 @@ public class MaskedTextWatcher implements TextWatcher {
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         if (mask == null) return;
 
+        if (!editting) {
+            editting = true;
+            int selectedPos = editText.getSelectionStart();
+            String withMask = applyMaskToString(s.toString());
+            editText.setText(withMask);
+            while (selectedPos < mask.length() && mask.charAt(selectedPos) != '#') {
+                selectedPos++;
+            }
+            editText.setSelection(selectedPos);
+            editting = false;
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ public class SampleActivity extends Activity implements View.OnClickListener {
 
         findViewById(R.id.apply).setOnClickListener(this);
 
-        maskedTextWatcher = new MaskedTextWatcher(null);
+        maskedTextWatcher = new MaskedTextWatcher(null, editText);
         testField.addTextChangedListener(maskedTextWatcher);
     }
 
