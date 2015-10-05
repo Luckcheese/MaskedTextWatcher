@@ -165,6 +165,25 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         assertEquals(expected.length(), editText.getSelectionEnd());
     }
 
+    public void testChangeMask() throws Exception {
+        mask.setMask("## ## ##");
+        editText.setText("123456");
+        assertEquals("12 34 56", editText.getText().toString());
+        assertEquals(8, editText.getSelectionStart());
+
+        mask.setMask("### ###");
+        assertEquals("123 456", editText.getText().toString());
+        assertEquals(7, editText.getSelectionStart());
+
+        mask.setMask("# # # # #");
+        assertEquals("1 2 3 4 5", editText.getText().toString());
+        assertEquals(9, editText.getSelectionStart());
+
+        mask.setMask("### ###");
+        assertEquals("123 45", editText.getText().toString());
+        assertEquals(6, editText.getSelectionStart());
+    }
+
     // ----- Helper methods ---------------------------------------------------
 
     private void keyboardKeyPressed(int keyCode, String expectedResult) {

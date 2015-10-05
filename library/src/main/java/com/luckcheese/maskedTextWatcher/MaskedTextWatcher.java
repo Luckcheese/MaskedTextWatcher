@@ -25,7 +25,12 @@ public class MaskedTextWatcher implements TextWatcher {
         }
         else {
             this.mask = new MaskInfo(mask);
-            editText.setText(applyMaskToString(editText.getText().toString()));
+
+            String currentText = editText.getText().toString();
+            if (currentText.length() > 0) {
+                editText.setText(applyMaskToString(currentText));
+                editText.setSelection(computeCursorNewPos(currentText, editText.getText().toString(), currentText.length()));
+            }
         }
     }
 
