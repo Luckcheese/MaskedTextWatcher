@@ -11,6 +11,7 @@ public class MaskedTextWatcher implements TextWatcher {
     private MaskInfo mask;
     private EditText editText;
 
+    private String originalString;
     private boolean editting;
 
     public MaskedTextWatcher(String mask, EditText editText) {
@@ -34,22 +35,22 @@ public class MaskedTextWatcher implements TextWatcher {
 
         if (!editting) {
             editting = true;
-            int selectedPos = editText.getSelectionStart();
+
             String withMask = applyMaskToString(s.toString());
             editText.setText(withMask);
-            if (selectedPos > withMask.length()) {
-                selectedPos = withMask.length();
-            }
-            while (selectedPos < mask.length() && mask.charAt(selectedPos) != '#') {
-                selectedPos++;
-            }
-            editText.setSelection(selectedPos);
+
+            int cursorPos = computeCursorNewPos(originalString, withMask, start);
+            editText.setSelection(cursorPos);
+
             editting = false;
         }
     }
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (!editting) {
+            originalString = s.toString();
+        }
         // do nothing
     }
 
@@ -85,6 +86,29 @@ public class MaskedTextWatcher implements TextWatcher {
             }
         }
         return formatted.toString();
+    }
+
+    protected int computeCursorNewPos(String originalString, String newString, int originalCursorPos) {
+        String originalStringSuffixCleaned = clean(originalString.substring(originalCursorPos));
+        String newStringCleaned = clean(newString);
+
+        // find original suffix on cleaned newString (check if some chars from original string were removed)
+        while (newStringCleaned.lastIndexOf(originalStringSuffixCleaned) == -1 &&
+                originalStringSuffixCleaned.length() > 0) {
+            originalStringSuffixCleaned = originalStringSuffixCleaned.substring(0, originalStringSuffixCleaned.length() - 1);
+        }
+
+        // place cursor before suffix
+        int cursorPos = newString.length();
+        int suffixPos = originalStringSuffixCleaned.length() - 1;
+        for (; cursorPos > 0 && suffixPos >= 0; cursorPos--) {
+            char c = newString.charAt(cursorPos - 1);
+            if (c == originalStringSuffixCleaned.charAt(suffixPos)) {
+                suffixPos--;
+            }
+        }
+
+        return cursorPos;
     }
 
     // ----- Related classes --------------------------------------------------

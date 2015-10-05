@@ -89,6 +89,26 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         assertEquals("0 2/1-3400", mask.format("02134"));
     }
 
+    public void testCursorPos() throws Exception {
+        mask.setMask("###");
+        assertEquals(0, mask.computeCursorNewPos("", "", 0));
+        assertEquals(1, mask.computeCursorNewPos("", "a", 0));
+        assertEquals(2, mask.computeCursorNewPos("", "aa", 0));
+        assertEquals(2, mask.computeCursorNewPos("a", "ab", 1));
+        assertEquals(1, mask.computeCursorNewPos("b", "ab", 0));
+        assertEquals(2, mask.computeCursorNewPos("ab", "acb", 1));
+
+        mask.setMask("##-##");
+        assertEquals(1, mask.computeCursorNewPos("", "a", 0));
+        assertEquals(3, mask.computeCursorNewPos("a", "ab-", 1));
+        assertEquals(4, mask.computeCursorNewPos("ab-", "ab-c", 3));
+        assertEquals(5, mask.computeCursorNewPos("ab-c", "ab-cd", 4));
+
+        assertEquals(3, mask.computeCursorNewPos("ab-c", "ad-bc", 1));
+        assertEquals(4, mask.computeCursorNewPos("ad-bc", "ad-eb", 3));
+        assertEquals(5, mask.computeCursorNewPos("ad-eb", "ad-ef", 4));
+    }
+
     public void testCardNumberMask() throws Exception {
         mask.setMask("#### #### #### ####");
         keyboardKeyPressed(KeyEvent.KEYCODE_0, "0");
