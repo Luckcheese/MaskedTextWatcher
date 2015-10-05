@@ -127,6 +127,8 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         keyboardKeyPressed(KeyEvent.KEYCODE_D, "0123 4567 89ab cd");
         keyboardKeyPressed(KeyEvent.KEYCODE_E, "0123 4567 89ab cde");
         keyboardKeyPressed(KeyEvent.KEYCODE_F, "0123 4567 89ab cdef");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0123 4567 89ab cdef");
+        keyboardKeyPressed(KeyEvent.KEYCODE_1, "0123 4567 89ab cdef");
     }
 
     public void testDateMask() throws Exception {
@@ -151,6 +153,16 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         keyboardKeyPressed(KeyEvent.KEYCODE_4, "0 2/3-41");
         keyboardKeyPressed(KeyEvent.KEYCODE_5, "0 2/3-45");
         keyboardKeyPressed(KeyEvent.KEYCODE_6, "0 2/3-45");
+    }
+
+    public void testPastText() throws Exception {
+        mask.setMask("# #/#-##");
+
+        editText.setText("01234");
+        String expected = "0 1/2-34";
+        assertEquals(expected, editText.getText().toString());
+        assertEquals(expected.length(), editText.getSelectionStart());
+        assertEquals(expected.length(), editText.getSelectionEnd());
     }
 
     // ----- Helper methods ---------------------------------------------------
