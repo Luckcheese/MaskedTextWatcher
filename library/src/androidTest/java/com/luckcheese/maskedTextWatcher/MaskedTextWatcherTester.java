@@ -91,22 +91,22 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
 
     public void testCursorPos() throws Exception {
         mask.setMask("###");
-        assertEquals(0, mask.computeCursorNewPos("", "", 0));
-        assertEquals(1, mask.computeCursorNewPos("", "a", 0));
-        assertEquals(2, mask.computeCursorNewPos("", "aa", 0));
-        assertEquals(2, mask.computeCursorNewPos("a", "ab", 1));
-        assertEquals(1, mask.computeCursorNewPos("b", "ab", 0));
-        assertEquals(2, mask.computeCursorNewPos("ab", "acb", 1));
+        assertEquals(0, mask.computeCursorNewPos("", "", 0, false));
+        assertEquals(1, mask.computeCursorNewPos("", "a", 0, false));
+        assertEquals(2, mask.computeCursorNewPos("", "aa", 0, false));
+        assertEquals(2, mask.computeCursorNewPos("a", "ab", 1, false));
+        assertEquals(1, mask.computeCursorNewPos("b", "ab", 0, false));
+        assertEquals(2, mask.computeCursorNewPos("ab", "acb", 1, false));
 
         mask.setMask("##-##");
-        assertEquals(1, mask.computeCursorNewPos("", "a", 0));
-        assertEquals(3, mask.computeCursorNewPos("a", "ab-", 1));
-        assertEquals(4, mask.computeCursorNewPos("ab-", "ab-c", 3));
-        assertEquals(5, mask.computeCursorNewPos("ab-c", "ab-cd", 4));
+        assertEquals(1, mask.computeCursorNewPos("", "a", 0, false));
+        assertEquals(3, mask.computeCursorNewPos("a", "ab-", 1, false));
+        assertEquals(4, mask.computeCursorNewPos("ab-", "ab-c", 3, false));
+        assertEquals(5, mask.computeCursorNewPos("ab-c", "ab-cd", 4, false));
 
-        assertEquals(3, mask.computeCursorNewPos("ab-c", "ad-bc", 1));
-        assertEquals(4, mask.computeCursorNewPos("ad-bc", "ad-eb", 3));
-        assertEquals(5, mask.computeCursorNewPos("ad-eb", "ad-ef", 4));
+        assertEquals(3, mask.computeCursorNewPos("ab-c", "ad-bc", 1, false));
+        assertEquals(4, mask.computeCursorNewPos("ad-bc", "ad-eb", 3, false));
+        assertEquals(5, mask.computeCursorNewPos("ad-eb", "ad-ef", 4, false));
     }
 
     public void testCardNumberMask() throws Exception {
@@ -182,6 +182,57 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         mask.setMask("### ###");
         assertEquals("123 45", editText.getText().toString());
         assertEquals(6, editText.getSelectionStart());
+    }
+
+    public void testBackspace() throws Exception {
+        mask.setMask("# #/#-##");
+
+        editText.setText("01234");
+        assertEquals("0 1/2-34", editText.getText().toString());
+        assertEquals(8, editText.getSelectionStart());
+
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 1/2-3", 7);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 1/2-", 6);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 1/", 4);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 ", 2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
+
+        editText.setText("01234");
+        assertEquals("0 1/2-34", editText.getText().toString());
+        assertEquals(8, editText.getSelectionStart());
+
+        editText.setSelection(5);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 1/3-4", 4);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0 3/4-", 2);
+
+        editText.setText("");
+        mask.setMask("### ###.###-##");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0", 1);
+        keyboardKeyPressed(KeyEvent.KEYCODE_1, "01", 2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_2, "012 ", 4);
+        keyboardKeyPressed(KeyEvent.KEYCODE_3, "012 3", 5);
+        keyboardKeyPressed(KeyEvent.KEYCODE_4, "012 34", 6);
+        keyboardKeyPressed(KeyEvent.KEYCODE_5, "012 345.", 8);
+        keyboardKeyPressed(KeyEvent.KEYCODE_6, "012 345.6", 9);
+        keyboardKeyPressed(KeyEvent.KEYCODE_7, "012 345.67", 10);
+        keyboardKeyPressed(KeyEvent.KEYCODE_8, "012 345.678-", 12);
+        keyboardKeyPressed(KeyEvent.KEYCODE_9, "012 345.678-9", 13);
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "012 345.678-90", 14);
+        assertEquals(14, editText.getSelectionStart());
+
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 345.678-9", 13);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 345.678-", 12);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 345.67", 10);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 345.6", 9);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 345.", 8);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 34", 6);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 3", 5);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "012 ", 4);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "01", 2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0", 1);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
     }
 
     // ----- Helper methods ---------------------------------------------------

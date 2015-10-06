@@ -29,7 +29,7 @@ public class MaskedTextWatcher implements TextWatcher {
             String currentText = editText.getText().toString();
             if (currentText.length() > 0) {
                 editText.setText(applyMaskToString(currentText));
-                editText.setSelection(computeCursorNewPos(currentText, editText.getText().toString(), currentText.length()));
+                editText.setSelection(computeCursorNewPos(currentText, editText.getText().toString(), currentText.length(), false));
             }
         }
     }
@@ -41,10 +41,19 @@ public class MaskedTextWatcher implements TextWatcher {
         if (!editting) {
             editting = true;
 
-            String withMask = applyMaskToString(s.toString());
+            String currentString = s.toString();
+            int newStart = start;
+            if (before == 1 && count == 0) {
+                while (mask.charAt(newStart) != '#') {
+                    newStart--;
+                }
+                currentString = currentString.substring(0, newStart) + currentString.substring(start);
+            }
+
+            String withMask = applyMaskToString(currentString);
             editText.setText(withMask);
 
-            int cursorPos = computeCursorNewPos(originalString, withMask, start);
+            int cursorPos = computeCursorNewPos(originalString, withMask, newStart, before > count);
             editText.setSelection(cursorPos);
 
             editting = false;
@@ -93,20 +102,26 @@ public class MaskedTextWatcher implements TextWatcher {
         return formatted.toString();
     }
 
-    protected int computeCursorNewPos(String originalString, String newString, int originalCursorPos) {
+    protected int computeCursorNewPos(String originalString, String newString, int originalCursorPos, boolean removing) {
         String originalStringSuffixCleaned = clean(originalString.substring(originalCursorPos));
         String newStringCleaned = clean(newString);
 
         // find original suffix on cleaned newString (check if some chars from original string were removed)
-        while (newStringCleaned.lastIndexOf(originalStringSuffixCleaned) == -1 &&
+        while (!newStringCleaned.endsWith(originalStringSuffixCleaned) &&
                 originalStringSuffixCleaned.length() > 0) {
-            originalStringSuffixCleaned = originalStringSuffixCleaned.substring(0, originalStringSuffixCleaned.length() - 1);
+
+            int start = removing ? 1 : 0;
+            int end = originalStringSuffixCleaned.length();
+            if (!removing) {
+                end --;
+            }
+            originalStringSuffixCleaned = originalStringSuffixCleaned.substring(start, end);
         }
 
         // place cursor before suffix
         int cursorPos = newString.length();
         int suffixPos = originalStringSuffixCleaned.length() - 1;
-        for (; cursorPos > 0 && suffixPos >= 0; cursorPos--) {
+        for (; cursorPos > originalCursorPos && suffixPos >= 0; cursorPos--) {
             char c = newString.charAt(cursorPos - 1);
             if (c == originalStringSuffixCleaned.charAt(suffixPos)) {
                 suffixPos--;
