@@ -1,6 +1,7 @@
 package com.luckcheese.maskedTextWatcher;
 
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
@@ -16,7 +17,14 @@ public class MaskedTextWatcher implements TextWatcher {
 
     public MaskedTextWatcher(String mask, EditText editText) {
         this.editText = editText;
+        removeSuggestions();
+
         setMask(mask);
+    }
+
+    private void removeSuggestions() {
+        int inputType = editText.getInputType();
+        editText.setInputType(inputType | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
     }
 
     public void setMask(String mask) {
