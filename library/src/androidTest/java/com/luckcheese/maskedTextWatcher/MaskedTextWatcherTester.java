@@ -235,6 +235,17 @@ public class MaskedTextWatcherTester extends AndroidTestCase {
         keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
     }
 
+    public void testRepeatingSameLetter() throws Exception {
+        mask.setMask("### ###");
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "0", 1);
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "00", 2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_0, "000 ", 4);
+
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "00", 2);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "0", 1);
+        keyboardKeyPressed(KeyEvent.KEYCODE_DEL, "", 0);
+    }
+
     // ----- Helper methods ---------------------------------------------------
 
     private void keyboardKeyPressed(int keyCode, String expectedResult, int expectedCursorPor) {
