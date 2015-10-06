@@ -19,6 +19,36 @@
             android:hint="Mask"
             android:maxLines="1" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16sp"
+            android:text="Keyboard style"
+            android:textSize="18sp"/>
+
+        <RadioGroup
+            android:id="@+id/keyboardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/numbers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Numbers"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Text"
+                android:textSize="14sp" />
+        </RadioGroup>
+
         <Button
             android:id="@+id/apply"
             android:layout_width="match_parent"
@@ -29,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="32dp"
             android:background="#AAAAAA" />
 
         <EditText
